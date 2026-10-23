@@ -6,129 +6,104 @@
   },
   "fileReviews": [
     {
-      "file": "src/components/TodoList.tsx",
+      "file": "src/premium.ts",
       "codeQuality": {
-        "file": "src/components/TodoList.tsx",
-        "issues": [
-          {
-            "line": 28,
-            "severity": "high",
-            "category": "performance",
-            "description": "Missing key prop on list items causing unnecessary re-renders",
-            "suggestion": "Add unique key prop: <TodoItem key={todo.id} todo={todo} />"
-          },
-          {
-            "line": 45,
-            "severity": "high",
-            "category": "bug-risk",
-            "description": "Event handler created on each render leading to memory leaks",
-            "suggestion": "Use useCallback: const handleDelete = useCallback((id) => {...}, [])"
-          },
-          {
-            "line": 12,
-            "severity": "medium",
-            "category": "maintainability",
-            "description": "Component too large (120 lines) - handles filtering, sorting, and rendering",
-            "suggestion": "Extract filtering/sorting logic into custom hooks or separate components"
-          },
-          {
-            "line": 67,
-            "severity": "medium",
-            "category": "best-practice",
-            "description": "Direct DOM manipulation detected bypassing React state",
-            "suggestion": "Use React state and controlled components instead of direct DOM access"
-          }
-        ],
-        "overallScore": 65,
-        "summary": "Performance issues and anti-patterns detected in React component rendering and lifecycle"
+        "file": "src/premium.ts",
+        "issues": [],
+        "overallScore": 15,
+        "summary": "This payment processing module has critical PCI-DSS compliance violations including handling raw credit card data, CVV storage potential, and insufficient audit logging. The lack of transaction atomicity means users could be charged without receiving their subscription. This code should NOT be deployed to production without significant security remediation."
       },
       "testCoverage": {
-        "file": "src/components/TodoList.tsx",
-        "hasTests": true,
-        "testFiles": [
-          "src/components/TodoList.test.tsx"
-        ],
-        "untestedPaths": [
-          {
-            "type": "branch",
-            "location": "filter logic at line 35",
-            "priority": "high",
-            "reasoning": "Multiple filter combinations not tested",
-            "suggestedTest": "Test all combinations: active/completed + sorted by date/priority"
-          },
-          {
-            "type": "function",
-            "location": "handleDelete callback at line 45",
-            "priority": "high",
-            "reasoning": "Undo/redo functionality after delete not covered",
-            "suggestedTest": "Verify deleted items can be recovered from error boundary"
-          }
-        ],
-        "coverageEstimate": 52,
-        "summary": "Component tests lack coverage for filter combinations and error recovery scenarios"
+        "file": "src/premium.ts",
+        "hasTests": false,
+        "testFiles": [],
+        "untestedPaths": [],
+        "coverageEstimate": 0,
+        "summary": "This payment processing module has ZERO test coverage. All 6 functions handling payment validation, card charging, pricing calculations, and subscription management are completely untested. This is unacceptable for financial transaction code."
       },
       "refactorings": {
-        "file": "src/components/TodoList.tsx",
-        "suggestions": [
-          {
-            "type": "extract-function",
-            "location": "TodoList component at line 12",
-            "impact": "high",
-            "description": "Extract FilterBar into separate component",
-            "before": "<input onChange={handleFilter} /> <select onChange={handleSort} />",
-            "after": "<FilterBar onFilterChange={handleFilter} onSortChange={handleSort} />",
-            "benefits": "Reusable filter component, easier testing, cleaner props management"
-          },
-          {
-            "type": "modernize",
-            "location": "State management at line 20",
-            "impact": "medium",
-            "description": "Replace useState with useReducer for complex state logic",
-            "before": "const [filter, setFilter] = useState(...); const [sort, setSort] = useState(...);",
-            "after": "const [state, dispatch] = useReducer(todoReducer, initialState);",
-            "benefits": "Easier state transitions, better predictability, cleaner action patterns"
-          }
-        ],
-        "summary": "Opportunities identified for splitting component responsibility and modernizing state management"
+        "file": "src/premium.ts",
+        "suggestions": [],
+        "summary": "Major architectural issues stemming from tight coupling between business logic and data access. Highest-impact refactorings: (1) Repository Pattern for testability, (2) PaymentValidator class extraction, (3) Configuration externalization."
       }
     }
   ],
   "summary": {
     "totalFiles": 1,
-    "overallScore": 65,
-    "criticalIssues": 0,
-    "highPriorityTests": 2,
-    "refactoringOpportunities": 2
+    "overallScore": 15,
+    "criticalIssues": 8,
+    "highPriorityTests": 7,
+    "refactoringOpportunities": 14
   },
   "recommendations": [
     {
-      "priority": "high",
-      "category": "performance",
-      "description": "Optimize React rendering with proper keys and useCallback hooks",
+      "priority": "critical",
+      "category": "Security - PCI-DSS Compliance",
+      "description": "This PR introduces payment processing that violates PCI-DSS requirements by handling raw credit card data. CANNOT be deployed to production in current form.",
       "files": [
-        "src/components/TodoList.tsx"
+        "src/premium.ts"
+      ]
+    },
+    {
+      "priority": "critical",
+      "category": "Security - Transaction Atomicity",
+      "description": "No transaction wrapping. If subscription update fails after charge succeeds, customer is charged but receives no service, creating chargebacks.",
+      "files": [
+        "src/premium.ts"
+      ]
+    },
+    {
+      "priority": "critical",
+      "category": "Security - Rate Limiting & Idempotency",
+      "description": "No rate limiting enables card testing attacks. No idempotency enables duplicate charges on retries.",
+      "files": [
+        "src/premium.ts"
+      ]
+    },
+    {
+      "priority": "critical",
+      "category": "Testing - Zero Coverage",
+      "description": "Zero test coverage on critical payment processing. Unacceptable for production code handling financial transactions.",
+      "files": [
+        "src/premium.ts"
+      ]
+    },
+    {
+      "priority": "critical",
+      "category": "Data Security - Input Validation",
+      "description": "Insufficient input validation and unsafe JSON parsing without try-catch.",
+      "files": [
+        "src/premium.ts"
+      ]
+    },
+    {
+      "priority": "critical",
+      "category": "Database - Least Privilege",
+      "description": "SELECT * violates least privilege. Could leak future sensitive data.",
+      "files": [
+        "src/premium.ts"
       ]
     },
     {
       "priority": "high",
-      "category": "testing",
-      "description": "Add comprehensive tests for filter and sort combinations",
+      "category": "Architecture - Testability",
+      "description": "Business logic tightly coupled with data access prevents testing without real database.",
       "files": [
-        "src/components/TodoList.tsx"
+        "src/premium.ts"
       ]
     },
     {
-      "priority": "medium",
-      "category": "refactoring",
-      "description": "Break down TodoList component into smaller focused components",
+      "priority": "high",
+      "category": "Configuration - Externalize Values",
+      "description": "Pricing tiers and features hardcoded. Changes require redeployment.",
       "files": [
-        "src/components/TodoList.tsx"
+        "src/premium.ts"
       ]
     }
   ],
   "metadata": {
-    "analyzedAt": "2026-10-22T22:12:54.363Z",
-    "duration": 125233,
+    "analyzedAt": "2026-10-23T08:57:46.171Z",
+    "duration": 290187,
     "agentVersions": {
       "code-quality-analyzer": "1.0.0",
       "test-coverage-analyzer": "1.0.0",

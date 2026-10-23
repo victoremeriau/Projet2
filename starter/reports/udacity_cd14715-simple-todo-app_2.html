@@ -47,7 +47,7 @@
   
   <div class="summary">
     <div class="metric">
-      <div class="metric-value">58</div>
+      <div class="metric-value">35</div>
       <div class="metric-label">Overall Score</div>
     </div>
     <div class="metric">
@@ -55,15 +55,15 @@
       <div class="metric-label">Files Reviewed</div>
     </div>
     <div class="metric">
-      <div class="metric-value">2</div>
+      <div class="metric-value">3</div>
       <div class="metric-label">Critical Issues</div>
     </div>
     <div class="metric">
-      <div class="metric-value">1</div>
+      <div class="metric-value">8</div>
       <div class="metric-label">Tests Needed</div>
     </div>
     <div class="metric">
-      <div class="metric-value">2</div>
+      <div class="metric-value">5</div>
       <div class="metric-label">Refactorings</div>
     </div>
   </div>
@@ -72,25 +72,37 @@
   <ul>
       <li class="rec-critical">
         <span class="priority">[CRITICAL]</span>
-        <strong>security</strong>: Implement comprehensive input validation for all user-provided data
-        <br><small>Files: src/services/todo.service.ts</small>
+        <strong>Security - SQL Injection</strong>: Three critical SQL injection vulnerabilities in new search functions (searchTodos, searchTodosByStatus, getTodosByUser). Replace template literals and string concatenation with parameterized queries immediately. These vulnerabilities allow attackers to execute arbitrary SQL code.
+        <br><small>Files: src/todo.ts</small>
       </li>
     
       <li class="rec-critical">
         <span class="priority">[CRITICAL]</span>
-        <strong>bug-risk</strong>: Add concurrency control mechanisms to prevent race conditions
-        <br><small>Files: src/services/todo.service.ts</small>
+        <strong>Testing - Authorization</strong>: getTodosByUser function lacks authorization checks. Must add tests verifying users can only access their own todos. This is a data privacy vulnerability that could expose todos from other users.
+        <br><small>Files: src/todo.ts</small>
+      </li>
+    
+      <li class="rec-critical">
+        <span class="priority">[CRITICAL]</span>
+        <strong>Testing - Input Validation</strong>: Three new search functions lack comprehensive input validation tests. Need tests for null/undefined inputs, SQL injection attempts, type confusion (searchTodosByStatus), and edge cases.
+        <br><small>Files: src/todo.ts</small>
       </li>
     
       <li class="rec-high">
         <span class="priority">[HIGH]</span>
-        <strong>testing</strong>: Add integration tests for database error scenarios
-        <br><small>Files: src/services/todo.service.ts</small>
+        <strong>Error Handling</strong>: Database operations throughout the file lack try-catch blocks and error logging. Add comprehensive error handling to prevent sensitive error details from reaching clients and enable debugging.
+        <br><small>Files: src/todo.ts</small>
+      </li>
+    
+      <li class="rec-high">
+        <span class="priority">[HIGH]</span>
+        <strong>Code Quality - Consistency</strong>: Inconsistent SQL query construction between existing CRUD functions (parameterized) and new search functions (string interpolation). Refactor using Query Builder or Repository pattern to standardize all database operations.
+        <br><small>Files: src/todo.ts</small>
       </li>
     </ul>
 
   <footer>
-    Generated at 2026-10-22T22:10:40.981Z • Duration: 20954ms
+    Generated at 2026-10-23T09:00:48.312Z • Duration: 135195ms
   </footer>
 </body>
 </html>

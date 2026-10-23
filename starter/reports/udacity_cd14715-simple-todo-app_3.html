@@ -47,7 +47,7 @@
   
   <div class="summary">
     <div class="metric">
-      <div class="metric-value">65</div>
+      <div class="metric-value">15</div>
       <div class="metric-label">Overall Score</div>
     </div>
     <div class="metric">
@@ -55,42 +55,54 @@
       <div class="metric-label">Files Reviewed</div>
     </div>
     <div class="metric">
-      <div class="metric-value">0</div>
+      <div class="metric-value">8</div>
       <div class="metric-label">Critical Issues</div>
     </div>
     <div class="metric">
-      <div class="metric-value">2</div>
+      <div class="metric-value">7</div>
       <div class="metric-label">Tests Needed</div>
     </div>
     <div class="metric">
-      <div class="metric-value">2</div>
+      <div class="metric-value">14</div>
       <div class="metric-label">Refactorings</div>
     </div>
   </div>
 
   <h2>🎯 Top Recommendations</h2>
   <ul>
-      <li class="rec-high">
-        <span class="priority">[HIGH]</span>
-        <strong>performance</strong>: Optimize React rendering with proper keys and useCallback hooks
-        <br><small>Files: src/components/TodoList.tsx</small>
+      <li class="rec-critical">
+        <span class="priority">[CRITICAL]</span>
+        <strong>Security - PCI-DSS Compliance</strong>: This PR introduces payment processing that violates PCI-DSS requirements by handling raw credit card data. CANNOT be deployed to production in current form.
+        <br><small>Files: src/premium.ts</small>
       </li>
     
-      <li class="rec-high">
-        <span class="priority">[HIGH]</span>
-        <strong>testing</strong>: Add comprehensive tests for filter and sort combinations
-        <br><small>Files: src/components/TodoList.tsx</small>
+      <li class="rec-critical">
+        <span class="priority">[CRITICAL]</span>
+        <strong>Security - Transaction Atomicity</strong>: No transaction wrapping. If subscription update fails after charge succeeds, customer is charged but receives no service, creating chargebacks.
+        <br><small>Files: src/premium.ts</small>
       </li>
     
-      <li class="rec-medium">
-        <span class="priority">[MEDIUM]</span>
-        <strong>refactoring</strong>: Break down TodoList component into smaller focused components
-        <br><small>Files: src/components/TodoList.tsx</small>
+      <li class="rec-critical">
+        <span class="priority">[CRITICAL]</span>
+        <strong>Security - Rate Limiting & Idempotency</strong>: No rate limiting enables card testing attacks. No idempotency enables duplicate charges on retries.
+        <br><small>Files: src/premium.ts</small>
+      </li>
+    
+      <li class="rec-critical">
+        <span class="priority">[CRITICAL]</span>
+        <strong>Testing - Zero Coverage</strong>: Zero test coverage on critical payment processing. Unacceptable for production code handling financial transactions.
+        <br><small>Files: src/premium.ts</small>
+      </li>
+    
+      <li class="rec-critical">
+        <span class="priority">[CRITICAL]</span>
+        <strong>Data Security - Input Validation</strong>: Insufficient input validation and unsafe JSON parsing without try-catch.
+        <br><small>Files: src/premium.ts</small>
       </li>
     </ul>
 
   <footer>
-    Generated at 2026-10-22T22:12:54.363Z • Duration: 125233ms
+    Generated at 2026-10-23T08:57:46.171Z • Duration: 290187ms
   </footer>
 </body>
 </html>

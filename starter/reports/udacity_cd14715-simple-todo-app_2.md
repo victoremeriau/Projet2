@@ -4,46 +4,47 @@
 
 | Metric | Value |
 |--------|-------|
-| **Overall Score** | 58/100 |
+| **Overall Score** | 35/100 |
 | **Files Reviewed** | 1 |
-| **Critical Issues** | 2 |
-| **High Priority Tests** | 1 |
-| **Refactoring Opportunities** | 2 |
+| **Critical Issues** | 3 |
+| **High Priority Tests** | 8 |
+| **Refactoring Opportunities** | 5 |
 
 ## 🎯 Top Recommendations
 
-1. 🚨 **security**: Implement comprehensive input validation for all user-provided data
-   - Files: src/services/todo.service.ts
+1. 🚨 **Security - SQL Injection**: Three critical SQL injection vulnerabilities in new search functions (searchTodos, searchTodosByStatus, getTodosByUser). Replace template literals and string concatenation with parameterized queries immediately. These vulnerabilities allow attackers to execute arbitrary SQL code.
+   - Files: src/todo.ts
 
-2. 🚨 **bug-risk**: Add concurrency control mechanisms to prevent race conditions
-   - Files: src/services/todo.service.ts
+2. 🚨 **Testing - Authorization**: getTodosByUser function lacks authorization checks. Must add tests verifying users can only access their own todos. This is a data privacy vulnerability that could expose todos from other users.
+   - Files: src/todo.ts
 
-3. ⚠️ **testing**: Add integration tests for database error scenarios
-   - Files: src/services/todo.service.ts
+3. 🚨 **Testing - Input Validation**: Three new search functions lack comprehensive input validation tests. Need tests for null/undefined inputs, SQL injection attempts, type confusion (searchTodosByStatus), and edge cases.
+   - Files: src/todo.ts
+
+4. ⚠️ **Error Handling**: Database operations throughout the file lack try-catch blocks and error logging. Add comprehensive error handling to prevent sensitive error details from reaching clients and enable debugging.
+   - Files: src/todo.ts
+
+5. ⚠️ **Code Quality - Consistency**: Inconsistent SQL query construction between existing CRUD functions (parameterized) and new search functions (string interpolation). Refactor using Query Builder or Repository pattern to standardize all database operations.
+   - Files: src/todo.ts
 
 ## 📁 File Details
 
-### 📄 `src/services/todo.service.ts`
+### 📄 `src/todo.ts`
 
-**Quality Score:** 58/100 | **Coverage:** ~45%
+**Quality Score:** 32/100 | **Coverage:** ~0%
 
-#### Issues (4)
-  - Line 42: `critical` Missing input validation on user-provided todo text allowing potential NoSQL injection
-  - Line 67: `high` Race condition in concurrent todo updates - no transaction or locking mechanism
-  - Line 89: `medium` N+1 query pattern when fetching todos with associated data
-
-  *...and 1 more*
-
-#### Test Gaps (2)
-  - `createTodo error handling at line 55` (critical priority)
-  - `updateTodo at line 65` (high priority)
+#### Issues (0)
+  None found
 
 
-#### Refactoring Opportunities (2)
-  - **extract-function**: Extract validation logic into dedicated validation service
-  - **pattern-improvement**: Implement repository pattern for database access
+#### Test Gaps (0)
+  None found
+
+
+#### Refactoring Opportunities (0)
+  None found
 
 
 ---
 
-*Generated at 2026-10-22T22:10:40.981Z • Duration: 20954ms*
+*Generated at 2026-10-23T09:00:48.312Z • Duration: 135195ms*

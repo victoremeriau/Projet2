@@ -8,122 +8,253 @@
     {
       "file": "fixtures/clean-code.ts",
       "codeQuality": {
+        "file": "fixtures/clean-code.ts",
         "issues": [
           {
-            "line": 15,
-            "severity": "high",
+            "line": 23,
+            "severity": "medium",
             "category": "security",
-            "description": "Email validation using regex pattern could be bypassed with certain Unicode characters",
-            "suggestion": "Use a library like `email-validator` or implement RFC 5322 compliant validation"
+            "description": "The pattern /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/ allows consecutive dots and doesn't properly validate domain structure, allowing invalid emails like 'a@b.c' or 'test@invalid.'",
+            "suggestion": "Review and refactor"
           },
           {
-            "line": 28,
+            "line": 41,
             "severity": "medium",
             "category": "maintainability",
-            "description": "Function `sanitizeInput` is too long (45 lines) and handles multiple concerns",
-            "suggestion": "Extract regex patterns and validation logic into separate utility functions"
+            "description": "Error message combines multiple validation failures making it difficult for API consumers to determine which field is missing",
+            "suggestion": "Review and refactor"
+          },
+          {
+            "line": 67,
+            "severity": "low",
+            "category": "performance",
+            "description": "Using Math.random() has poor entropy and concatenation is inefficient. Could lead to ID collisions in high-throughput scenarios",
+            "suggestion": "Review and refactor"
+          },
+          {
+            "line": 30,
+            "severity": "low",
+            "category": "best-practice",
+            "description": "sanitizeInput doesn't validate input length or check for null/undefined, which could cause runtime issues",
+            "suggestion": "Review and refactor"
+          },
+          {
+            "line": 45,
+            "severity": "medium",
+            "category": "security",
+            "description": "Only name field is sanitized; email should also be validated against XSS payloads to prevent stored XSS",
+            "suggestion": "Review and refactor"
           },
           {
             "line": 38,
             "severity": "low",
             "category": "best-practice",
-            "description": "Using `any` type for user input parameter reduces type safety",
-            "suggestion": "Define and use a proper `UserInput` interface with strict typing"
-          }
-        ],
-        "overallScore": 72
-      },
-      "testCoverage": {
-        "untestedPaths": [
-          {
-            "type": "function",
-            "location": "sanitizeInput at line 28",
-            "priority": "critical",
-            "reasoning": "Security-critical function with no test coverage for edge cases",
-            "suggestedTest": "Test XSS payloads, SQL injection attempts, and Unicode bypass attempts"
+            "description": "Function doesn't verify input is an object before accessing properties",
+            "suggestion": "Review and refactor"
           },
           {
-            "type": "edge-case",
-            "location": "validateEmail at line 10",
-            "priority": "high",
-            "reasoning": "Email validation should cover international domains and edge cases",
-            "suggestedTest": "Test with punycode domains, plus addressing, and subdomains"
+            "line": 73,
+            "severity": "info",
+            "category": "best-practice",
+            "description": "The saveUser function is stubbed out with commented code, suggesting incomplete implementation",
+            "suggestion": "Review and refactor"
+          },
+          {
+            "line": 60,
+            "severity": "low",
+            "category": "maintainability",
+            "description": "If saveUser fails silently, the function returns a user that wasn't actually saved",
+            "suggestion": "Review and refactor"
           }
         ],
-        "coverageEstimate": 35
+        "overallScore": 50,
+        "summary": "Code quality analysis completed"
+      },
+      "testCoverage": {
+        "file": "fixtures/clean-code.ts",
+        "hasTests": false,
+        "testFiles": [],
+        "untestedPaths": [],
+        "coverageEstimate": 0,
+        "summary": "Test coverage analysis completed"
       },
       "refactorings": {
+        "file": "fixtures/clean-code.ts",
         "suggestions": [
           {
+            "type": "simplify",
+            "location": "lines 29-75",
+            "impact": "medium",
+            "description": "Group isValidEmail, sanitizeInput, and createUser into a UserService class following Single Responsibility Principle",
+            "before": "// current code",
+            "after": "// refactored code",
+            "benefits": "Encapsulates user-related logic into cohesive class, Improves testability through dependency injection, Easier to mock database dependencies, Better separation of concerns"
+          },
+          {
+            "type": "simplify",
+            "location": "line 70-72",
+            "impact": "medium",
+            "description": "Use 'uuid' package instead of Date.now() + Math.random() concatenation",
+            "before": "// current code",
+            "after": "// refactored code",
+            "benefits": "Eliminates collision risk, Cryptographically secure random generation, Industry standard UUID format, Reduces maintenance burden"
+          },
+          {
+            "type": "simplify",
+            "location": "line 23-25",
+            "impact": "medium",
+            "description": "Use 'email-validator' package instead of custom regex",
+            "before": "// current code",
+            "after": "// refactored code",
+            "benefits": "RFC 5322 compliant validation, Handles international domains and special cases, Eliminates false positives/negatives, Reduces maintenance"
+          },
+          {
+            "type": "simplify",
+            "location": "line 33-38",
+            "impact": "medium",
+            "description": "Use 'xss' package instead of manual HTML entity escaping",
+            "before": "// current code",
+            "after": "// refactored code",
+            "benefits": "Comprehensive XSS prevention, Handles more attack vectors, Maintained by security experts, Covers edge cases and new vulnerabilities"
+          },
+          {
+            "type": "pattern-improvement",
+            "location": "line 77-81",
+            "impact": "medium",
+            "description": "Extract database logic into a separate UserRepository class injected as dependency",
+            "before": "// current code",
+            "after": "// refactored code",
+            "benefits": "Enables testability with mock database, Allows swapping different storage backends, Reduces global dependencies, Follows SOLID principles"
+          },
+          {
+            "type": "pattern-improvement",
+            "location": "line 42-48",
+            "impact": "medium",
+            "description": "Extract inline validation logic into separate UserInputValidator class",
+            "before": "// current code",
+            "after": "// refactored code",
+            "benefits": "Separates validation concerns from business logic, Enables reusable validation rules, Returns all validation errors at once, Easier to test validation independently"
+          },
+          {
             "type": "extract-function",
-            "location": "sanitizeInput at line 28",
-            "impact": "high",
-            "description": "Extract regex sanitization logic into dedicated functions",
-            "before": "const sanitized = input.replace(/[<>]/g, \"\").replace(/script/gi, \"\");",
-            "after": "const sanitized = stripHtmlTags(input).removeScriptTags();",
-            "benefits": "Improves testability, readability, and reusability of sanitization logic"
+            "location": "line 56-61",
+            "impact": "medium",
+            "description": "Create separate factory method for user object creation",
+            "before": "// current code",
+            "after": "// refactored code",
+            "benefits": "Improves readability of createUser, Centralizes user object construction, Easier to test object creation separately, Facilitates adding/changing fields"
           },
           {
             "type": "modernize",
-            "location": "validateEmail at line 10",
+            "location": "line 33-38",
             "impact": "medium",
-            "description": "Use modern regex syntax and optional chaining",
-            "before": "if (user && user.email) { return validateEmail(user.email); }",
-            "after": "return validateEmail(user?.email ?? \"\");",
-            "benefits": "More concise and readable modern TypeScript patterns"
+            "description": "Replace chained replace() calls with declarative entity mapping",
+            "before": "// current code",
+            "after": "// refactored code",
+            "benefits": "More declarative character mapping, Easier to add new entities, Clearer intent"
+          },
+          {
+            "type": "simplify",
+            "location": "line 42-48",
+            "impact": "medium",
+            "description": "Catch whitespace-only inputs in validation",
+            "before": "// current code",
+            "after": "// refactored code",
+            "benefits": "Prevents whitespace-only submissions, Better data quality, Cleaner validation logic"
           }
-        ]
+        ],
+        "summary": "Refactoring suggestions completed"
       }
     }
   ],
   "summary": {
     "totalFiles": 1,
-    "overallScore": 72,
-    "criticalIssues": 1,
-    "highPriorityTests": 2,
-    "refactoringOpportunities": 2
+    "overallScore": 82,
+    "criticalIssues": 0,
+    "highPriorityTests": 5,
+    "refactoringOpportunities": 9
   },
   "recommendations": [
     {
       "priority": "critical",
+      "category": "testing",
+      "description": "Implement comprehensive test suite for fixtures/clean-code.ts. File has 0% test coverage with critical security-related functions (sanitizeInput, createUser) that must be thoroughly tested.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "high",
       "category": "security",
-      "description": "Input validation and sanitization need comprehensive security review and test coverage",
+      "description": "Replace custom email validation regex with dedicated library. Current regex is too permissive and doesn't properly validate domain structure per RFC 5322 standards.",
       "files": [
         "fixtures/clean-code.ts"
       ]
     },
     {
       "priority": "high",
-      "category": "testing",
-      "description": "Add unit tests for email validation with international domains and edge cases",
+      "category": "security",
+      "description": "Upgrade ID generation to use cryptographically secure method. Current Math.random() + timestamp concatenation could lead to collisions.",
       "files": [
         "fixtures/clean-code.ts"
       ]
     },
     {
       "priority": "high",
-      "category": "testing",
-      "description": "Add security tests for XSS and injection attack patterns in sanitization",
+      "category": "architecture",
+      "description": "Extract UserService class to encapsulate user management logic. Group isValidEmail, sanitizeInput, and createUser into cohesive class with dependency injection for database access.",
       "files": [
         "fixtures/clean-code.ts"
       ]
     },
     {
       "priority": "medium",
-      "category": "refactoring",
-      "description": "Break down sanitizeInput function into smaller, focused utility functions",
+      "category": "security",
+      "description": "Improve input sanitization with dedicated XSS library. Current manual HTML entity escaping may miss edge cases and new attack vectors.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "maintainability",
+      "description": "Improve error messages to be specific about which field is missing or invalid. Generic error messages reduce debuggability for API consumers.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "quality",
+      "description": "Add input type guards and edge-case handling. Function lacks null/undefined checks and sanitizeInput doesn't validate input length.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "low",
+      "category": "performance",
+      "description": "Implement explicit error handling around database save operation. Currently no error handling if saveUser fails.",
+      "files": [
+        "fixtures/clean-code.ts"
+      ]
+    },
+    {
+      "priority": "low",
+      "category": "code-quality",
+      "description": "Complete database implementation or clearly document as fixture/mock. The commented db.query line suggests incomplete work.",
       "files": [
         "fixtures/clean-code.ts"
       ]
     }
   ],
   "metadata": {
-    "analyzedAt": "2026-10-22T22:08:14.524Z",
-    "duration": 54281,
+    "analyzedAt": "2026-10-23T08:49:47.132Z",
+    "duration": 126647,
     "agentVersions": {
-      "code-quality-analyzer": "1.0.0",
-      "test-coverage-analyzer": "1.0.0",
-      "refactoring-suggester": "1.0.0"
+      "code-quality-analyzer": "1.0",
+      "test-coverage-analyzer": "1.0",
+      "refactoring-suggester": "1.0"
     }
   }
 }

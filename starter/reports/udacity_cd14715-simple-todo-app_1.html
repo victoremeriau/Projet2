@@ -47,7 +47,7 @@
   
   <div class="summary">
     <div class="metric">
-      <div class="metric-value">72</div>
+      <div class="metric-value">82</div>
       <div class="metric-label">Overall Score</div>
     </div>
     <div class="metric">
@@ -55,15 +55,15 @@
       <div class="metric-label">Files Reviewed</div>
     </div>
     <div class="metric">
-      <div class="metric-value">1</div>
+      <div class="metric-value">0</div>
       <div class="metric-label">Critical Issues</div>
     </div>
     <div class="metric">
-      <div class="metric-value">2</div>
+      <div class="metric-value">5</div>
       <div class="metric-label">Tests Needed</div>
     </div>
     <div class="metric">
-      <div class="metric-value">2</div>
+      <div class="metric-value">9</div>
       <div class="metric-label">Refactorings</div>
     </div>
   </div>
@@ -72,31 +72,37 @@
   <ul>
       <li class="rec-critical">
         <span class="priority">[CRITICAL]</span>
-        <strong>security</strong>: Input validation and sanitization need comprehensive security review and test coverage
+        <strong>testing</strong>: Implement comprehensive test suite for fixtures/clean-code.ts. File has 0% test coverage with critical security-related functions (sanitizeInput, createUser) that must be thoroughly tested.
         <br><small>Files: fixtures/clean-code.ts</small>
       </li>
     
       <li class="rec-high">
         <span class="priority">[HIGH]</span>
-        <strong>testing</strong>: Add unit tests for email validation with international domains and edge cases
+        <strong>security</strong>: Replace custom email validation regex with dedicated library. Current regex is too permissive and doesn't properly validate domain structure per RFC 5322 standards.
         <br><small>Files: fixtures/clean-code.ts</small>
       </li>
     
       <li class="rec-high">
         <span class="priority">[HIGH]</span>
-        <strong>testing</strong>: Add security tests for XSS and injection attack patterns in sanitization
+        <strong>security</strong>: Upgrade ID generation to use cryptographically secure method. Current Math.random() + timestamp concatenation could lead to collisions.
+        <br><small>Files: fixtures/clean-code.ts</small>
+      </li>
+    
+      <li class="rec-high">
+        <span class="priority">[HIGH]</span>
+        <strong>architecture</strong>: Extract UserService class to encapsulate user management logic. Group isValidEmail, sanitizeInput, and createUser into cohesive class with dependency injection for database access.
         <br><small>Files: fixtures/clean-code.ts</small>
       </li>
     
       <li class="rec-medium">
         <span class="priority">[MEDIUM]</span>
-        <strong>refactoring</strong>: Break down sanitizeInput function into smaller, focused utility functions
+        <strong>security</strong>: Improve input sanitization with dedicated XSS library. Current manual HTML entity escaping may miss edge cases and new attack vectors.
         <br><small>Files: fixtures/clean-code.ts</small>
       </li>
     </ul>
 
   <footer>
-    Generated at 2026-10-22T22:08:14.524Z • Duration: 54281ms
+    Generated at 2026-10-23T08:49:47.132Z • Duration: 126647ms
   </footer>
 </body>
 </html>

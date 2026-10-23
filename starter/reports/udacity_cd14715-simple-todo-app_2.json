@@ -6,129 +6,120 @@
   },
   "fileReviews": [
     {
-      "file": "src/services/todo.service.ts",
+      "file": "src/todo.ts",
       "codeQuality": {
-        "file": "src/services/todo.service.ts",
-        "issues": [
-          {
-            "line": 42,
-            "severity": "critical",
-            "category": "security",
-            "description": "Missing input validation on user-provided todo text allowing potential NoSQL injection",
-            "suggestion": "Add validation: const sanitized = String(text).trim(); if (!sanitized) throw new Error(\"Invalid text\");"
-          },
-          {
-            "line": 67,
-            "severity": "high",
-            "category": "bug-risk",
-            "description": "Race condition in concurrent todo updates - no transaction or locking mechanism",
-            "suggestion": "Implement optimistic locking with version field or use database transactions"
-          },
-          {
-            "line": 89,
-            "severity": "medium",
-            "category": "performance",
-            "description": "N+1 query pattern when fetching todos with associated data",
-            "suggestion": "Use database joins or batch loading instead of sequential queries"
-          },
-          {
-            "line": 15,
-            "severity": "low",
-            "category": "style",
-            "description": "Missing error handling for database connection failures",
-            "suggestion": "Add try-catch blocks and proper error propagation to caller"
-          }
-        ],
-        "overallScore": 58,
-        "summary": "Critical security and concurrency issues found in database operations requiring immediate attention"
+        "file": "src/todo.ts",
+        "issues": [],
+        "overallScore": 32,
+        "summary": "Critical SQL injection vulnerabilities in three functions (searchTodos, searchTodosByStatus, getTodosByUser) that directly interpolate user input into SQL queries. These are severe security issues that could allow attackers to extract, modify, or delete database contents. Additionally, the code lacks comprehensive error handling, input validation, audit logging, and uses a weak ID generation algorithm."
       },
       "testCoverage": {
-        "file": "src/services/todo.service.ts",
-        "hasTests": true,
-        "testFiles": [
-          "src/services/todo.service.test.ts"
-        ],
-        "untestedPaths": [
-          {
-            "type": "branch",
-            "location": "createTodo error handling at line 55",
-            "priority": "critical",
-            "reasoning": "Database error scenarios never tested but affect data integrity",
-            "suggestedTest": "Mock database failures and verify error handling behavior"
-          },
-          {
-            "type": "function",
-            "location": "updateTodo at line 65",
-            "priority": "high",
-            "reasoning": "Concurrent update scenarios not covered",
-            "suggestedTest": "Simulate parallel updates and verify consistency"
-          }
-        ],
-        "coverageEstimate": 45,
-        "summary": "Insufficient test coverage for critical error handling and concurrent operations"
+        "file": "src/todo.ts",
+        "hasTests": false,
+        "testFiles": [],
+        "untestedPaths": [],
+        "coverageEstimate": 0,
+        "summary": "Critical test coverage gaps in three new search functions. Estimated 35% overall coverage. Most critical gaps: getTodosByUser (authorization vulnerability), searchTodos (SQL injection), and searchTodosByStatus (type confusion and validation). Input sanitization and error handling paths largely untested. Immediate testing required before PR approval."
       },
       "refactorings": {
-        "file": "src/services/todo.service.ts",
-        "suggestions": [
-          {
-            "type": "extract-function",
-            "location": "createTodo at line 40",
-            "impact": "high",
-            "description": "Extract validation logic into dedicated validation service",
-            "before": "if (!text || text.length > 500) { /* validation */ }",
-            "after": "const validated = this.validator.validateTodoText(text);",
-            "benefits": "Reusable validation, easier testing, centralized business rules"
-          },
-          {
-            "type": "pattern-improvement",
-            "location": "Service class at line 1",
-            "impact": "medium",
-            "description": "Implement repository pattern for database access",
-            "before": "this.db.collection(\"todos\").findOne(...)",
-            "after": "this.todoRepository.findById(id)",
-            "benefits": "Better abstraction, easier mocking, cleaner separation of concerns"
-          }
-        ],
-        "summary": "Multiple refactoring opportunities to improve maintainability and testability"
+        "file": "src/todo.ts",
+        "suggestions": [],
+        "summary": "Critical refactoring needed to fix SQL injection vulnerabilities through standardized parameterized queries. Repository/Query Builder pattern would eliminate duplication. Strategy pattern for search operations would improve maintainability. High-impact improvements possible through security-focused refactoring."
       }
     }
   ],
   "summary": {
     "totalFiles": 1,
-    "overallScore": 58,
-    "criticalIssues": 2,
-    "highPriorityTests": 1,
-    "refactoringOpportunities": 2
+    "overallScore": 35,
+    "criticalIssues": 3,
+    "highPriorityTests": 8,
+    "refactoringOpportunities": 5
   },
   "recommendations": [
     {
       "priority": "critical",
-      "category": "security",
-      "description": "Implement comprehensive input validation for all user-provided data",
+      "category": "Security - SQL Injection",
+      "description": "Three critical SQL injection vulnerabilities in new search functions (searchTodos, searchTodosByStatus, getTodosByUser). Replace template literals and string concatenation with parameterized queries immediately. These vulnerabilities allow attackers to execute arbitrary SQL code.",
       "files": [
-        "src/services/todo.service.ts"
+        "src/todo.ts"
       ]
     },
     {
       "priority": "critical",
-      "category": "bug-risk",
-      "description": "Add concurrency control mechanisms to prevent race conditions",
+      "category": "Testing - Authorization",
+      "description": "getTodosByUser function lacks authorization checks. Must add tests verifying users can only access their own todos. This is a data privacy vulnerability that could expose todos from other users.",
       "files": [
-        "src/services/todo.service.ts"
+        "src/todo.ts"
+      ]
+    },
+    {
+      "priority": "critical",
+      "category": "Testing - Input Validation",
+      "description": "Three new search functions lack comprehensive input validation tests. Need tests for null/undefined inputs, SQL injection attempts, type confusion (searchTodosByStatus), and edge cases.",
+      "files": [
+        "src/todo.ts"
       ]
     },
     {
       "priority": "high",
-      "category": "testing",
-      "description": "Add integration tests for database error scenarios",
+      "category": "Error Handling",
+      "description": "Database operations throughout the file lack try-catch blocks and error logging. Add comprehensive error handling to prevent sensitive error details from reaching clients and enable debugging.",
       "files": [
-        "src/services/todo.service.ts"
+        "src/todo.ts"
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "Code Quality - Consistency",
+      "description": "Inconsistent SQL query construction between existing CRUD functions (parameterized) and new search functions (string interpolation). Refactor using Query Builder or Repository pattern to standardize all database operations.",
+      "files": [
+        "src/todo.ts"
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "Code Quality - ID Validation",
+      "description": "ID parameters in multiple functions lack validation before database queries. Add format validation to getTodoById, updateTodoStatus, and deleteTodo functions.",
+      "files": [
+        "src/todo.ts"
+      ]
+    },
+    {
+      "priority": "high",
+      "category": "Security - ID Generation",
+      "description": "generateId function uses weak algorithm (Date.now() + Math.random()). Replace with cryptographically secure UUID v4 to prevent ID prediction and collision attacks.",
+      "files": [
+        "src/todo.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Audit & Compliance",
+      "description": "No logging for critical operations (create, update, delete). Add audit logging to track who performed what actions and when, required for compliance and security investigations.",
+      "files": [
+        "src/todo.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Code Quality - Type Safety",
+      "description": "Database results are cast directly to Todo type without runtime validation. Add type guards or validation functions to ensure database schema matches expected types.",
+      "files": [
+        "src/todo.ts"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "Performance",
+      "description": "getAllTodos fetches all records without pagination, could impact performance on large datasets. Add limit/offset parameters and consider eager loading for related data.",
+      "files": [
+        "src/todo.ts"
       ]
     }
   ],
   "metadata": {
-    "analyzedAt": "2026-10-22T22:10:40.981Z",
-    "duration": 20954,
+    "analyzedAt": "2026-10-23T09:00:48.312Z",
+    "duration": 135195,
     "agentVersions": {
       "code-quality-analyzer": "1.0.0",
       "test-coverage-analyzer": "1.0.0",
